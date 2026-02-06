@@ -1,0 +1,10 @@
+{
+  "id": "ldr-grid-tracker",
+  "name": "LDR | Grid Tracker",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Visualize the progress of your daily habits with GitHub-style grids",
+  "author": "LDR_Dev",
+  "authorUrl": "https://github.com/eric-rojas",
+  "isDesktopOnly": false
+}

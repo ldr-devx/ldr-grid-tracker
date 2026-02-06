@@ -1,0 +1,1235 @@
+/* ====================================
+   LDR | HABIT GRID TRACKER - ESTILOS CORREGIDOS
+   ====================================
+
+   GUÍA DE EDICIÓN:
+   - Banner: línea ~30
+   - Paneles (cards): línea ~180
+   - Pequeños recuadros (celdas del grid): línea ~280
+   - Tooltip: línea ~340
+   - Estadísticas: línea ~380
+
+   ==================================== */
+
+/* Variables CSS */
+.habit-grid-container {
+    --cell-size: 11px;
+    --cell-gap: 3px;
+    --border-radius: 2px;
+    --card-bg: rgba(30, 30, 40, 0.4);
+    --card-border: rgba(255, 255, 255, 0.03);
+    --cell-empty: rgba(255, 255, 255, 0.06);
+    --glass-blur: 16px;
+
+    padding: 0;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Dark theme */
+.theme-dark .habit-grid-container {
+    --card-bg: rgba(20, 20, 30, 0.4);
+    --card-border: rgba(255, 255, 255, 0.03);
+    --cell-empty: rgba(255, 255, 255, 0.06);
+}
+
+/* Light theme */
+.theme-light .habit-grid-container {
+    --card-bg: rgba(255, 255, 255, 0.5);
+    --card-border: rgba(0, 0, 0, 0.05);
+    --cell-empty: rgba(0, 0, 0, 0.08);
+}
+
+/* ====================================
+   BANNER - Estilo Obsidian con difuminado
+
+   Para editar el difuminado del banner:
+   - Altura del banner: height en .habit-grid-banner
+   - Intensidad del difuminado: modifica los % y rgba
+   - Altura del gradiente: height
+   ==================================== */
+
+.habit-grid-banner {
+    width: 100%;
+    height: 280px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
+    /* Aseguramos que el contenedor no tenga fondo para que se vea lo de atrás */
+    background: transparent;
+}
+
+.habit-grid-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        black 50%,
+        /* Imagen 100% visible hasta la mitad */ transparent 100%
+            /* Imagen totalmente transparente al final */
+    );
+
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
+
+.habit-grid-banner::after {
+    display: none;
+}
+
+/* Texto y superposiciones */
+.habit-grid-banner-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 32px;
+    z-index: 1;
+}
+
+.habit-grid-banner-title {
+    color: white;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+    /* Aumentamos un poco la sombra del texto para asegurar
+       que se lea bien sin importar qué fondo tengas detrás */
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+    letter-spacing: -0.5px;
+}
+
+/* ====================================
+   CONTENEDOR DE CONTENIDO
+
+   Para editar el espacio entre banner y paneles:
+   - padding-top: espacio arriba del contenido
+   - margin-top: puede ser negativo para superponer con el banner
+   ==================================== */
+.habit-grid-content {
+    padding: 32px 32px 24px 32px; /* EDITAR: arriba derecha abajo izquierda */
+    margin-top: 0; /* EDITAR: Espacio entre banner y contenido */
+    position: relative;
+    z-index: 2;
+}
+
+/* ====================================
+   HEADER (cuando no hay banner)
+   ==================================== */
+.habit-grid-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.habit-grid-title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.habit-grid-logo {
+    font-size: 32px;
+}
+
+.habit-grid-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    padding-left: 12px;
+    background: linear-gradient(
+        135deg,
+        var(--text-accent) 0%,
+        var(--interactive-accent) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.habit-grid-year {
+    display: inline-block;
+    padding: 4px 16px;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* ====================================
+   PANELES (Stats Overview y Habit Cards)
+
+   Para editar los paneles:
+   - Fondo: background en .habit-card y .habit-stats-overview
+   - Bordes: border (hazlo más sutil con menor opacidad)
+   - Sombras: box-shadow (inset = hacia adentro)
+   - Blur del glass: --glass-blur arriba en variables
+   ==================================== */
+
+/* Panel de estadísticas general */
+.habit-stats-overview {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: none; /* Sin borde visible */
+    border-radius: 20px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    position: relative; /* ✅ AGREGADO: Para posicionamiento del tooltip */
+
+    /* EDITAR SOMBRAS:
+	   - Primera sombra (inset): sombra interna arriba
+	   - Segunda sombra: sombra externa abajo
+	*/
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.03),
+        /* Brillo sutil arriba */ inset 0 -20px 40px -20px rgba(0, 0, 0, 0.3),
+        /* Sombra interna abajo */ 0 10px 40px -10px rgba(0, 0, 0, 0.4); /* Sombra externa abajo */
+}
+
+.habit-stats-overview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.habit-stats-overview-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.habit-stats-overview-period {
+    font-size: 12px;
+    color: var(--text-faint);
+}
+
+.habit-chart-container {
+    position: relative;
+    height: 120px;
+    margin-bottom: 16px;
+    cursor: crosshair; /* ✅ AGREGADO: Indica que es interactivo */
+}
+
+.habit-chart-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.habit-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.habit-chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.habit-chart-legend-item:hover {
+    opacity: 0.7;
+}
+
+.habit-chart-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+/* ====================================
+   PANELES DE GRIDS (Habit Cards)
+
+   EDITAR AQUÍ para cambiar apariencia de los paneles de grids
+   ==================================== */
+.habit-grids-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* EDITAR: Espacio entre paneles */
+}
+
+/* ====================================
+   PANELES DE GRIDS - CON FLIP 3D
+   ==================================== */
+
+.habit-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: none;
+    border-radius: 20px;
+    padding: 0;
+    position: relative;
+
+    perspective: 1200px;
+    overflow: hidden;
+    transition: height 0.35s ease;
+}
+
+/* Hover solo cuando NO está volteado */
+.habit-card:not(.flipped):hover {
+    transform: translateY(-2px);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.05),
+        inset 0 -25px 50px -25px rgba(0, 0, 0, 0.2),
+        0 16px 50px -12px rgba(0, 0, 0, 0.4);
+}
+
+/* Estado volteado */
+.habit-card.flipped .habit-card-flip-inner {
+    transform: rotateY(180deg);
+}
+
+/* ====================================
+   ESTRUCTURA FLIP (NUEVAS CLASES)
+   ==================================== */
+
+.habit-card-flip-inner {
+    position: relative;
+    width: 100%;
+
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.habit-card-front {
+    width: 100%;
+    position: relative;
+    z-index: 2;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: rotateY(0deg);
+    padding: 24px 28px; /* ✅ AGREGAR ESTA LÍNEA */
+}
+
+.habit-card-back {
+    padding: 20px 24px;
+    box-sizing: border-box;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    transform: rotateY(180deg);
+}
+
+/* ====================================
+   RESTO DEL CSS DEL REVERSO
+   (Pegar TODO esto DESPUÉS de .habit-card-header)
+   ==================================== */
+
+/* Header del reverso */
+.card-back-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-back-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-normal);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-back-title .back-arrow {
+    opacity: 0.5;
+    font-size: 14px;
+}
+
+.flip-button {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.flip-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(180deg);
+}
+
+/* Grid de 4 columnas */
+.card-back-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    flex: 1;
+}
+
+.stat-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    min-height: 200px;
+}
+
+.stat-column-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+}
+
+/* Columna 1: Gráfico Donut */
+.donut-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 120px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.donut-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.donut-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+.donut-percentage {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-normal);
+    line-height: 1;
+}
+
+.donut-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* Columna 2: Día más productivo */
+.top-day-display {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.top-day-main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.top-day-icon {
+    font-size: 18px;
+}
+
+.top-day-info {
+    flex: 1;
+}
+
+.top-day-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-normal);
+}
+
+.top-day-percent {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.week-bars {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 50px;
+    padding-top: 8px;
+    position: relative;
+}
+
+.week-bar {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    transition: background 0.3s ease;
+    min-height: 5%;
+}
+
+.week-bar.top {
+    background: var(--interactive-accent);
+}
+
+.week-bar-label {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    color: var(--text-faint);
+    white-space: nowrap;
+}
+
+.trend-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.trend-arrow {
+    font-size: 14px;
+}
+
+.trend-arrow.up {
+    color: #4ade80;
+}
+
+.trend-arrow.down {
+    color: #ef4444;
+}
+
+.trend-arrow.stable {
+    color: #fbbf24;
+}
+
+/* Columna 3: XP y Nivel */
+.xp-display {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.level-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.level-icon {
+    font-size: 22px;
+}
+
+.level-icon-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(73%) sepia(25%) saturate(1685%)
+        hue-rotate(211deg) brightness(103%) contrast(98%);
+}
+
+.level-info {
+    flex: 1;
+}
+
+.level-number {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.level-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-normal);
+}
+
+.xp-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.xp-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
+    border-radius: 5px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.xp-bar-fill.almost-level-up {
+    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.xp-numbers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.xp-to-next {
+    font-size: 10px;
+    color: var(--text-faint);
+    text-align: center;
+}
+
+/* Columna 4: Badges */
+/* Badge item - contenedor */
+.badge-item {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    position: relative;
+    transition: all 0.3s ease;
+    padding: 8px; /* ✅ Espacio para que el SVG no toque los bordes */
+    overflow: hidden; /* ✅ Importante para el checkmark */
+}
+
+.badge-item::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 30, 0.95);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.badge-item:hover::before {
+    opacity: 1;
+}
+
+/* ✅ NUEVO: Estilos para el icono SVG */
+.badge-icon {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    /* SVG blanco por defecto */
+    filter: brightness(0) saturate(100%) invert(100%) opacity(0.4);
+    pointer-events: visible;
+}
+
+/* Badge desbloqueado - fondo con gradiente y borde */
+.badge-item.unlocked {
+    background: linear-gradient(
+        135deg,
+        rgba(139, 92, 246, 0.2) 0%,
+        rgba(167, 139, 250, 0.1) 100%
+    );
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
+}
+
+/* Icono en badge desbloqueado - color morado brillante */
+.badge-item.unlocked .badge-icon {
+    /* Morado brillante (#a78bfa) */
+    filter: brightness(0) saturate(100%) invert(73%) sepia(25%) saturate(1685%)
+        hue-rotate(211deg) brightness(103%) contrast(98%);
+}
+
+/* Hover en badge desbloqueado */
+.badge-item.unlocked:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 24px rgba(139, 92, 246, 0.5);
+    border-color: rgba(139, 92, 246, 0.6);
+}
+
+.badge-item.unlocked:hover .badge-icon {
+    /* Hacer el icono más brillante al hover */
+    filter: brightness(0) saturate(100%) invert(83%) sepia(25%) saturate(1685%)
+        hue-rotate(211deg) brightness(113%) contrast(108%);
+}
+
+/* Badge bloqueado - oscuro y con grayscale */
+.badge-item.locked {
+    opacity: 0.4;
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.04);
+}
+
+.badge-item.locked .badge-icon {
+    /* Gris oscuro */
+    filter: grayscale(100%) brightness(0.3) opacity(0.5);
+}
+
+/* Checkmark verde en esquina inferior derecha */
+.badge-item.unlocked::after {
+    content: "✓";
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background: #22c55e;
+    color: white;
+    font-size: 10px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 2px solid var(--card-bg);
+    box-shadow: 0 2px 6px rgba(34, 197, 94, 0.4);
+}
+
+/* Tooltip al hacer hover */
+.badge-item[data-tooltip]:hover::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.95);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    white-space: nowrap;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    /* Pequeña flecha hacia abajo */
+    border-bottom: 2px solid rgba(139, 92, 246, 0.5);
+}
+
+/* Grid de badges */
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+/* Animaciones */
+.habit-card.flipped .card-back-stats > * {
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+}
+
+.habit-card.flipped .card-back-stats > *:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.habit-card.flipped .card-back-stats > *:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.habit-card.flipped .card-back-stats > *:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.habit-card.flipped .card-back-stats > *:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Indicador de flip */
+.habit-card:not(.flipped)::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.habit-card:not(.flipped):hover::before {
+    opacity: 0.3;
+}
+
+/* Focus para accesibilidad */
+.habit-card:focus-visible {
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: 2px;
+}
+
+.flip-button:focus-visible {
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-back-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .stat-column {
+        padding: 10px;
+        min-height: 180px;
+    }
+
+    .donut-percentage {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-back-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .badges-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+.habit-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.habit-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Icono del hábito - puede ser emoji, imagen, o icono */
+.habit-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.habit-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.habit-tema {
+    text-transform: capitalize;
+}
+
+.habit-streak {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+}
+
+/* ====================================
+   PEQUEÑOS RECUADROS (Celdas del Grid)
+
+   EDITAR AQUÍ para cambiar los cuadritos del grid
+   ==================================== */
+.grid-wrapper {
+    overflow-x: auto;
+    padding-bottom: 8px;
+    display: flex;
+    justify-content: center;
+}
+
+.year-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: fit-content;
+}
+
+.grid-month-labels {
+    display: flex;
+    gap: 0;
+    margin-left: 36px;
+    margin-bottom: 4px;
+    height: 16px;
+}
+
+.day-label-spacer {
+    width: 0;
+}
+
+.month-label {
+    font-size: 10px;
+    color: var(--text-faint);
+    font-weight: 500;
+    min-width: 56px;
+}
+
+.grid-content {
+    display: flex;
+    gap: 4px;
+}
+
+.grid-day-labels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cell-gap);
+    width: 28px;
+    flex-shrink: 0;
+}
+
+.day-label {
+    height: var(--cell-size);
+    font-size: 9px;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 4px;
+}
+
+.grid-weeks {
+    display: flex;
+    gap: var(--cell-gap);
+}
+
+.grid-week {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cell-gap);
+}
+
+/* Pequeños recuadros individuales */
+.grid-cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border-radius: var(--border-radius);
+    transition:
+        transform 0.1s ease,
+        outline 0.1s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.grid-cell:hover {
+    transform: scale(1.5);
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: 1px;
+    z-index: 10;
+}
+
+.grid-cell.empty-cell {
+    background: transparent !important;
+    cursor: default;
+    visibility: hidden;
+}
+
+.grid-cell.empty-cell:hover {
+    transform: none;
+    outline: none;
+}
+
+/* Celdas NO completadas - color gris oscuro/opaco */
+.grid-cell[data-level="0"] {
+    background-color: var(--cell-empty) !important;
+}
+
+/* ====================================
+   TOOLTIP
+   ==================================== */
+.grid-cell.has-tooltip {
+    position: relative;
+}
+
+.grid-tooltip {
+    position: fixed;
+    background: rgba(20, 20, 28, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 99999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.grid-tooltip.visible {
+    opacity: 1;
+}
+
+.grid-tooltip-date {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.grid-tooltip-status {
+    color: var(--text-muted);
+}
+
+.grid-tooltip-status.completed {
+    color: #4ade80;
+}
+
+/* ====================================
+   ESTADÍSTICAS (footer de cada panel)
+   ==================================== */
+.habit-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/*Barra de progreso más grande y siempre visible */
+.progress-bar {
+    width: 120px;
+    min-width: 120px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 5px;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-left: 0;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    position: relative;
+}
+
+/* Fill de la barra con transición suave */
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 3px;
+    background-color: var(--interactive-accent);
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.progress-bar-fill[style*="width: 0"] {
+    opacity: 0.3;
+}
+
+.progress-bar-fill[style*="width: 100%"] {
+    background: linear-gradient(
+        90deg,
+        var(--interactive-accent) 0%,
+        var(--interactive-accent-hover) 100%
+    );
+    box-shadow: 0 0 8px rgba(var(--interactive-accent-rgb), 0.4);
+}
+
+/* ====================================
+   MENSAJES
+   ==================================== */
+.habit-grid-message {
+    text-align: center;
+    padding: 60px 40px;
+    margin: 24px;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    border-radius: 20px;
+    border: none;
+    box-shadow:
+        inset 0 -20px 40px -20px rgba(0, 0, 0, 0.3),
+        0 10px 40px -10px rgba(0, 0, 0, 0.4);
+}
+
+.habit-grid-message h2 {
+    margin-bottom: 12px;
+    font-size: 24px;
+}
+
+.habit-grid-message p {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.habit-grid-message button {
+    padding: 10px 24px;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.habit-grid-message button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.habit-grid-message.error h2 {
+    color: #dc3545;
+}
+
+/* ====================================
+   SETTINGS TAB - Generador de colores
+   ==================================== */
+.setting-item pre {
+    background: var(--background-secondary);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.5;
+    border: 1px solid var(--background-modifier-border);
+}
+
+.setting-item code {
+    font-family: var(--font-monospace);
+}
+
+.color-generator-container {
+    margin-top: 12px;
+    padding: 16px;
+    background: var(--background-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--background-modifier-border);
+}
+
+.color-generator-preview {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+    justify-content: center;
+}
+
+.color-generator-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.color-generator-output {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--background-primary);
+    border-radius: 8px;
+    font-family: var(--font-monospace);
+    font-size: 12px;
+    word-break: break-all;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.color-generator-output:hover {
+    background: var(--background-modifier-hover);
+}
+
+/* ====================================
+   RESPONSIVE
+   ==================================== */
+@media (max-width: 768px) {
+    .habit-grid-content {
+        padding: 20px 16px;
+    }
+
+    .habit-card {
+        padding: 16px 20px;
+        border-radius: 16px;
+    }
+
+    .habit-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .habit-stats {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .grid-wrapper {
+        justify-content: flex-start;
+    }
+
+    .habit-grid-banner {
+        height: 200px;
+    }
+
+    .habit-grid-banner-title {
+        font-size: 22px;
+    }
+
+    /* ✅ AGREGADO: Barra de progreso en móvil */
+    .progress-bar {
+        width: 100px;
+        min-width: 100px;
+    }
+}

@@ -1,0 +1,16 @@
+{
+  "configFilePath": "Personal/Habit_Grid.md",
+  "weekStartsOn": "monday",
+  "showStats": true,
+  "gridCellSize": 11,
+  "gridGap": 3,
+  "defaultColors": [
+    "#ebedf0",
+    "#9be9a8",
+    "#40c463",
+    "#30a14e",
+    "#216e39"
+  ],
+  "openOnStartup": false,
+  "bannerImagePath": "Art/Banners/Eyes2.jpg"
+}
