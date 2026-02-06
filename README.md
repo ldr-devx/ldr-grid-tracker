@@ -28,8 +28,8 @@ An Obsidian plugin that visualizes your daily habit progress using GitHub-style 
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/habit-grid-tracker.git
-cd habit-grid-tracker
+git clone https://github.com/eric-rojas/ldr-grid-tracker.git
+cd ldr-grid-tracker
 
 # Install dependencies
 npm install
