@@ -1,5 +1,5 @@
 
-# Habit Grid Tracker
+# LDR | Grid Tracker
 
 An Obsidian plugin that visualizes your daily habit progress using GitHub-style grids.
 
