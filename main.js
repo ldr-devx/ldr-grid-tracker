@@ -280,6 +280,7 @@ var HabitGridView = class extends import_obsidian.ItemView {
     this.chartData = null;
     this.chartDays = null;
     this.resizeObserver = null;
+    this.containerResizeObserver = null;
   }
 
   getViewType() {
@@ -293,11 +294,33 @@ var HabitGridView = class extends import_obsidian.ItemView {
   }
   async onOpen() {
     await this.loadAndRender();
+    // Observar cambios de tamaño del contenedor (paneles laterales de Obsidian)
+    this.containerResizeObserver = new ResizeObserver(() => {
+      const overviewContainer = this.contentEl.querySelector(
+        ".overview-container",
+      );
+      if (overviewContainer) {
+        overviewContainer.style.display = "none";
+        requestAnimationFrame(() => {
+          overviewContainer.style.display = "";
+          this.redrawChart();
+        });
+      }
+    });
+    this.containerResizeObserver.observe(this.contentEl);
   }
   async onClose() {
     this.contentEl.empty();
     if (this.tooltip) {
       this.tooltip.remove();
+    }
+    if (this.containerResizeObserver) {
+      this.containerResizeObserver.disconnect();
+      this.containerResizeObserver = null;
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
     }
   }
   /**
@@ -431,7 +454,18 @@ var HabitGridView = class extends import_obsidian.ItemView {
    */
   renderStatsOverview(container) {
     if (!this.config || this.config.habits.length === 0) return;
-    const overviewCard = container.createDiv({ cls: "habit-stats-overview" });
+
+    // ✅ Crear contenedor de 2 columnas
+    const overviewContainer = container.createDiv({
+      cls: "overview-container",
+    });
+
+    // ✅ Columna 1: Gráfico de líneas
+    const chartSection = overviewContainer.createDiv({ cls: "stats-overview" });
+    const overviewCard = chartSection.createDiv({
+      cls: "habit-stats-overview",
+    }); // ✅ Dentro de chartSection
+
     const header = overviewCard.createDiv({
       cls: "habit-stats-overview-header",
     });
@@ -440,14 +474,16 @@ var HabitGridView = class extends import_obsidian.ItemView {
       cls: "habit-stats-overview-title",
     });
     header.createSpan({
-      text: "\xDAltimos 30 d\xEDas",
+      text: "Últimos 30 días",
       cls: "habit-stats-overview-period",
     });
+
     const chartContainer = overviewCard.createDiv({
       cls: "habit-chart-container",
     });
     this.chartContainer = chartContainer;
     this.renderChart(chartContainer);
+
     const legend = overviewCard.createDiv({ cls: "habit-chart-legend" });
     for (const habit of this.config.habits) {
       const legendItem = legend.createDiv({ cls: "habit-chart-legend-item" });
@@ -456,6 +492,12 @@ var HabitGridView = class extends import_obsidian.ItemView {
         habit.colors[Math.min(2, habit.colors.length - 1)];
       legendItem.createSpan({ text: habit.tema });
     }
+
+    // ✅ Columna 2: Panel de checklist de hoy
+    const todaySection = overviewContainer.createDiv({
+      cls: "today-checklist-panel",
+    });
+    this.renderTodayChecklist(todaySection);
   }
   /**
    * Renderiza el gráfico de líneas
@@ -794,7 +836,6 @@ var HabitGridView = class extends import_obsidian.ItemView {
 
       animateCardHeight(card, goingToBack);
       card.classList.toggle("flipped");
-      updateCardHeight(card);
     });
 
     // Soporte de teclado (Enter o Espacio)
@@ -802,7 +843,6 @@ var HabitGridView = class extends import_obsidian.ItemView {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         card.classList.toggle("flipped");
-        updateCardHeight(card);
       }
     });
   }
@@ -1015,6 +1055,416 @@ var HabitGridView = class extends import_obsidian.ItemView {
     );
     return { currentStreak, bestStreak, totalDays, thisWeek };
   }
+
+  /**
+   * Obtiene la fecha actual en formato YYYY-MM-DD
+   */
+  getTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * Actualiza el contador del footer
+   */
+  updateTodayFooter() {
+    if (!this.config) return;
+
+    const footer = document.querySelector(".today-footer");
+    if (!footer) return;
+
+    const today = this.getTodayDate();
+    const completed = this.config.habits.filter((h) =>
+      this.isDayCompleted(today, h.tema),
+    ).length;
+    const total = this.config.habits.length;
+
+    footer.textContent = `${completed}/${total} completados`;
+    console.log(`📊 Footer actualizado: ${completed}/${total}`);
+  }
+
+  /**
+   * Actualiza las celdas del grid para el día de hoy
+   */
+  updateGridCells() {
+    if (!this.config) return;
+
+    const today = this.getTodayDate();
+    console.log(`🔄 Actualizando celdas para: ${today}`);
+
+    // Buscar todas las celdas con la fecha de hoy
+    const cells = document.querySelectorAll(`[data-date="${today}"]`);
+    console.log(`  Encontradas ${cells.length} celdas`);
+
+    cells.forEach((cell) => {
+      // Obtener el card padre para saber qué hábito es
+      const card = cell.closest(".habit-card");
+      if (!card) return;
+
+      const habitName = card.querySelector(".habit-tema")?.textContent;
+      if (!habitName) return;
+
+      const isCompleted = this.isDayCompleted(today, habitName);
+
+      // Encontrar el hábito
+      const habit = this.config.habits.find((h) => h.tema === habitName);
+      if (!habit) return;
+
+      console.log(`  ${habitName}: ${isCompleted ? "✅" : "❌"}`);
+
+      // Actualizar visual
+      if (isCompleted) {
+        cell.setAttribute("data-level", "1");
+        const colorIndex = Math.min(1, habit.colors.length - 1);
+        cell.style.backgroundColor = habit.colors[colorIndex];
+      } else {
+        cell.setAttribute("data-level", "0");
+        cell.style.backgroundColor = "";
+      }
+    });
+  }
+
+  /**
+   * Renderiza el panel de checklist para el día actual
+   */
+  renderTodayChecklist(container) {
+    if (!this.config) return;
+
+    const today = this.getTodayDate();
+    const todayFormatted = formatDateForDisplay(today);
+
+    // Header del panel
+    const header = container.createDiv({ cls: "today-header" });
+    const dateTitle = header.createDiv({ cls: "today-date" });
+    dateTitle.setText(todayFormatted);
+
+    const subtitle = header.createDiv({ cls: "today-subtitle" });
+    subtitle.setText("Marca tus hábitos de hoy");
+
+    // Lista de hábitos
+    const habitsList = container.createDiv({ cls: "today-habits-list" });
+
+    for (const habit of this.config.habits) {
+      const habitItem = habitsList.createDiv({ cls: "today-habit-item" });
+
+      // Checkbox
+      const checkbox = habitItem.createEl("input", {
+        type: "checkbox",
+        cls: "today-habit-checkbox",
+      });
+
+      // Verificar si ya está marcado para hoy usando todoEntries
+      const isChecked = this.isDayCompleted(today, habit.tema);
+      checkbox.checked = isChecked;
+
+      // Label con emoji y tema
+      const label = habitItem.createDiv({ cls: "today-habit-label" });
+
+      if (habit.emoji) {
+        const emojiSpan = label.createSpan({ cls: "today-habit-emoji" });
+        emojiSpan.setText(habit.emoji);
+      }
+
+      const nameSpan = label.createSpan({ cls: "today-habit-name" });
+      nameSpan.setText(habit.tema);
+
+      // Event listener - UN SOLO LISTENER
+      checkbox.addEventListener("change", async (e) => {
+        e.stopPropagation();
+
+        const newState = checkbox.checked;
+
+        console.log(`\n🖱️ Checkbox clickeado: ${habit.tema} → ${newState}`);
+
+        // Actualizar clase visual INMEDIATAMENTE
+        if (newState) {
+          habitItem.addClass("checked");
+        } else {
+          habitItem.removeClass("checked");
+        }
+
+        // Actualizar datos
+        await this.toggleHabitForToday(habit.tema, today, newState);
+      });
+
+      // Aplicar estado inicial
+      if (isChecked) {
+        habitItem.addClass("checked");
+      }
+    }
+
+    // Footer con estadísticas del día
+    const footer = container.createDiv({ cls: "today-footer" });
+    const completed = this.config.habits.filter((h) =>
+      this.isDayCompleted(today, h.tema),
+    ).length;
+    const total = this.config.habits.length;
+
+    footer.setText(`${completed}/${total} completados`);
+  }
+  /**
+   * Actualiza solo el footer del panel de hoy
+   */
+  updateTodayFooter() {
+    const footer = document.querySelector(".today-footer");
+    if (!footer || !this.config) return;
+
+    const today = this.getTodayDate();
+    const completed = this.config.habits.filter((h) =>
+      this.isDayCompleted(today, h.tema),
+    ).length;
+    const total = this.config.habits.length;
+
+    footer.textContent = `${completed}/${total} completados`;
+  }
+  /**
+   * Actualiza las celdas del grid sin recargar todo
+   */
+  updateGridCells() {
+    if (!this.config) return;
+
+    const today = this.getTodayDate();
+
+    // Buscar todas las celdas con la fecha de hoy
+    const cells = document.querySelectorAll(`[data-date="${today}"]`);
+
+    cells.forEach((cell) => {
+      // Obtener el hábito de esta celda (del panel padre)
+      const card = cell.closest(".habit-card");
+      if (!card) return;
+
+      const habitName = card.querySelector(".habit-tema")?.textContent;
+      if (!habitName) return;
+
+      const isCompleted = this.isDayCompleted(today, habitName);
+
+      // Encontrar el hábito para obtener sus colores
+      const habit = this.config.habits.find((h) => h.tema === habitName);
+      if (!habit) return;
+
+      // Actualizar el nivel y color
+      if (isCompleted) {
+        cell.setAttribute("data-level", "1");
+        cell.style.backgroundColor = habit.colors[1] || habit.colors[0];
+      } else {
+        cell.setAttribute("data-level", "0");
+        cell.style.backgroundColor = "";
+      }
+    });
+  }
+
+  /**
+   * Marca o desmarca un hábito para el día actual
+   */
+  async toggleHabitForToday(habitName, date, isChecked) {
+    if (!this.config) return;
+
+    console.log(`\n🔄 ========== TOGGLE HABIT ==========`);
+    console.log(`Hábito: ${habitName}`);
+    console.log(`Fecha: ${date}`);
+    console.log(`Marcar como: ${isChecked ? "COMPLETADO" : "NO COMPLETADO"}`);
+
+    // Crear entrada si no existe
+    if (!this.config.todoEntries.has(date)) {
+      console.log(`📝 Creando nueva entrada para ${date}`);
+      this.config.todoEntries.set(date, new Map());
+    }
+
+    const dayEntries = this.config.todoEntries.get(date);
+    const habitLower = habitName.toLowerCase().trim();
+
+    // Actualizar estado
+    dayEntries.set(habitLower, isChecked);
+
+    console.log(`✅ Estado en memoria actualizado`);
+    console.log(`   todoEntries[${date}][${habitLower}] = ${isChecked}`);
+
+    try {
+      // Actualizar archivo
+      await this.updateMarkdownFile();
+
+      // Actualizar UI
+      this.updateTodayFooter();
+      this.updateGridCells();
+
+      console.log(`✅ TODO ACTUALIZADO CORRECTAMENTE\n`);
+    } catch (error) {
+      console.error(`❌ ERROR al actualizar:`, error);
+    }
+  }
+
+  /**
+   * Actualiza el archivo markdown con los cambios
+   */
+  async updateMarkdownFile() {
+    if (!this.config) return;
+
+    const file = this.app.vault.getAbstractFileByPath(
+      this.plugin.settings.configFilePath,
+    );
+
+    if (!file || !(file instanceof import_obsidian.TFile)) {
+      console.error("❌ Archivo no encontrado");
+      return;
+    }
+
+    console.log(`📝 Actualizando archivo: ${file.path}`);
+
+    try {
+      // Leer contenido actual
+      const content = await this.app.vault.read(file);
+      const lines = content.split("\n");
+      const updatedLines = [];
+
+      let inTodoSection = false;
+      let currentDateISO = null;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        // Detectar inicio TODO
+        if (trimmed.match(/^#\s+TODO\s*list/i)) {
+          inTodoSection = true;
+          updatedLines.push(line);
+          continue;
+        }
+
+        // Detectar fin TODO
+        if (
+          inTodoSection &&
+          trimmed.match(/^#\s+[^#]/) &&
+          !trimmed.match(/^##/) &&
+          !trimmed.match(/^#\s+TODO/i)
+        ) {
+          inTodoSection = false;
+          updatedLines.push(line);
+          continue;
+        }
+
+        // Fuera de TODO, copiar tal cual
+        if (!inTodoSection) {
+          updatedLines.push(line);
+          continue;
+        }
+
+        // Dentro de TODO - detectar fecha
+        const dateMatch = trimmed.match(/^##\s*(\d{1,2}\/\d{1,2}\/\d{4})/);
+        if (dateMatch) {
+          currentDateISO = parseDateFromDMY(dateMatch[1]);
+          updatedLines.push(line); // Agregar línea de fecha
+
+          console.log(
+            `📅 Procesando fecha: ${dateMatch[1]} → ${currentDateISO}`,
+          );
+
+          // Si tenemos datos para esta fecha, escribir checkboxes
+          if (currentDateISO && this.config.todoEntries.has(currentDateISO)) {
+            const dayEntries = this.config.todoEntries.get(currentDateISO);
+
+            console.log(
+              `✍️ Escribiendo ${this.config.habits.length} hábitos para ${currentDateISO}`,
+            );
+
+            // Escribir checkbox para cada hábito
+            for (const habit of this.config.habits) {
+              const habitLower = habit.tema.toLowerCase().trim();
+              const isChecked = dayEntries.get(habitLower) === true;
+              const checkbox = isChecked ? "[x]" : "[ ]";
+
+              updatedLines.push(`- ${checkbox} ${habit.tema}`);
+
+              console.log(`  ${checkbox} ${habit.tema}`);
+            }
+
+            // Saltar líneas viejas de checkboxes
+            i++;
+            while (i < lines.length) {
+              const nextTrimmed = lines[i].trim();
+
+              // Si es otra fecha o sección, retroceder
+              if (
+                nextTrimmed.startsWith("##") ||
+                (nextTrimmed.startsWith("#") && !nextTrimmed.startsWith("###"))
+              ) {
+                i--;
+                break;
+              }
+
+              // Si es checkbox viejo, saltar
+              if (nextTrimmed.startsWith("- [")) {
+                i++;
+                continue;
+              }
+
+              // Si es línea vacía, saltar
+              if (nextTrimmed === "") {
+                i++;
+                continue;
+              }
+
+              // Cualquier otra cosa, retroceder
+              i--;
+              break;
+            }
+          }
+
+          currentDateISO = null;
+          continue;
+        }
+
+        // Otras líneas
+        updatedLines.push(line);
+      }
+
+      // Agregar fechas nuevas que no existen aún en el archivo
+      const existingDates = new Set();
+      for (const line of lines) {
+        const m = line.trim().match(/^##\s*(\d{1,2}\/\d{1,2}\/\d{4})/);
+        if (m) {
+          const iso = parseDateFromDMY(m[1]);
+          if (iso) existingDates.add(iso);
+        }
+      }
+
+      for (const [dateISO, dayEntries] of this.config.todoEntries) {
+        if (existingDates.has(dateISO)) continue; // ya existe, fue manejada arriba
+
+        // Convertir ISO a DD/MM/YYYY
+        const [year, month, day] = dateISO.split("-");
+        const dmy = `${day}/${month}/${year}`;
+
+        console.log(`\u2795 Agregando nueva fecha al archivo: ${dmy}`);
+
+        updatedLines.push("");
+        updatedLines.push(`## ${dmy}`);
+        for (const habit of this.config.habits) {
+          const habitLower = habit.tema.toLowerCase().trim();
+          const isChecked = dayEntries.get(habitLower) === true;
+          const checkbox = isChecked ? "[x]" : "[ ]";
+          updatedLines.push(`- ${checkbox} ${habit.tema}`);
+        }
+      }
+
+      // Escribir archivo (con flag para evitar que el evento "modify" dispare refreshView)
+      const newContent = updatedLines.join("\n");
+      this.plugin._isSaving = true;
+      await this.app.vault.modify(file, newContent);
+      setTimeout(() => {
+        this.plugin._isSaving = false;
+      }, 500);
+
+      console.log("\u2705 Archivo actualizado exitosamente");
+    } catch (error) {
+      console.error("❌ Error al actualizar archivo:", error);
+    }
+  }
+
+  // (duplicate updateMarkdownFile removed - using the correct version above)
+
   /**
    * Calcula estadísticas avanzadas para el reverso
    */
@@ -2055,11 +2505,13 @@ var HabitGridPlugin = class extends import_obsidian3.Plugin {
       },
     });
     this.addSettingTab(new HabitGridSettingTab(this.app, this));
+    this._isSaving = false;
     this.registerEvent(
       this.app.vault.on("modify", (file) => {
         if (
           file instanceof import_obsidian3.TFile &&
-          file.path === this.settings.configFilePath
+          file.path === this.settings.configFilePath &&
+          !this._isSaving
         ) {
           this.refreshView();
         }

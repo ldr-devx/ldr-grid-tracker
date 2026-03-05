@@ -1,57 +1,4 @@
 /* ====================================
-   PP MODEL MONO - Font Face Declarations
-   Archivos en: .obsidian/plugins/ldr-grid-tracker/fonts/
-   ==================================== */
-
-@font-face {
-    font-family: "PPModelMono";
-    src: url("fonts/PPModelMono-Light.otf") format("opentype");
-    font-weight: 300;
-    font-style: normal;
-}
-@font-face {
-    font-family: "PPModelMono";
-    src: url("fonts/PPModelMono-LightItalic.otf") format("opentype");
-    font-weight: 300;
-    font-style: italic;
-}
-@font-face {
-    font-family: "PPModelMono";
-    src: url("fonts/PPModelMono-Medium.otf") format("opentype");
-    font-weight: 500;
-    font-style: normal;
-}
-@font-face {
-    font-family: "PPModelMono";
-    src: url("fonts/PPModelMono-MediumItalic.otf") format("opentype");
-    font-weight: 500;
-    font-style: italic;
-}
-@font-face {
-    font-family: "PPModelMono";
-    src: url("fonts/PPModelMono-Super.otf") format("opentype");
-    font-weight: 700;
-    font-style: normal;
-}
-@font-face {
-    font-family: "PPModelMono";
-    src: url("fonts/PPModelMono-SuperItalic.otf") format("opentype");
-    font-weight: 700;
-    font-style: italic;
-}
-
-/* ====================================
-   ESCALA TIPOGRÁFICA NORMALIZADA
-   --font-xs:   10px  → labels, fechas grid, meta info
-   --font-sm:   11px  → badges, subtítulos secundarios
-   --font-base: 12px  → texto general, checkboxes, stats
-   --font-md:   14px  → nombres de hábitos, items checklist
-   --font-lg:   16px  → títulos de sección, encabezados card
-   --font-xl:   20px  → título principal, today-date
-   --font-2xl:  24px  → año badge, banner title
-   ==================================== */
-
-/* ====================================
    LDR | HABIT GRID TRACKER - ESTILOS CORREGIDOS
    ====================================
 
@@ -74,19 +21,6 @@
     --cell-empty: rgba(255, 255, 255, 0.06);
     --glass-blur: 16px;
 
-    /* Escala tipográfica */
-    --font-xs: 10px;
-    --font-sm: 11px;
-    --font-base: 12px;
-    --font-md: 14px;
-    --font-lg: 16px;
-    --font-xl: 20px;
-    --font-2xl: 24px;
-
-    /* Fuente global del plugin */
-    font-family: "PPModelMono", "JetBrains Mono", "Fira Code", monospace;
-    font-weight: 300;
-
     padding: 0;
     max-width: 100%;
     margin: 0 auto;
@@ -104,38 +38,6 @@
     --card-bg: rgba(255, 255, 255, 0.5);
     --card-border: rgba(0, 0, 0, 0.05);
     --cell-empty: rgba(0, 0, 0, 0.08);
-}
-
-/* Herencia de fuente para todos los elementos del plugin */
-.habit-grid-container *,
-.habit-grid-container h1,
-.habit-grid-container h2,
-.habit-grid-container h3,
-.habit-grid-container h4,
-.habit-grid-container span,
-.habit-grid-container div,
-.habit-grid-container button,
-.habit-grid-container input {
-    font-family: inherit;
-}
-
-/* Pesos por tipo de elemento */
-.habit-grid-container .habit-grid-title,
-.habit-grid-container .today-date,
-.habit-grid-container .habit-tema {
-    font-weight: 700;
-}
-
-.habit-grid-container .habit-stats-overview-title,
-.habit-grid-container .today-subtitle,
-.habit-grid-container .habit-streak {
-    font-weight: 500;
-}
-
-.habit-grid-container .today-habit-name,
-.habit-grid-container .habit-stats-item-label,
-.habit-grid-container .today-footer {
-    font-weight: 300;
 }
 
 /* ====================================
@@ -189,8 +91,8 @@
 
 .habit-grid-banner-title {
     color: white;
-    font-size: var(--font-2xl);
-    font-weight: 500;
+    font-size: 28px;
+    font-weight: 600;
     margin: 0;
     /* Aumentamos un poco la sombra del texto para asegurar
        que se lea bien sin importar qué fondo tengas detrás */
@@ -231,11 +133,11 @@
 }
 
 .habit-grid-logo {
-    font-size: var(--font-2xl);
+    font-size: 32px;
 }
 
 .habit-grid-title {
-    font-size: var(--font-2xl);
+    font-size: 28px;
     font-weight: 700;
     margin: 0;
     padding-left: 12px;
@@ -255,8 +157,8 @@
     background: var(--interactive-accent);
     color: var(--text-on-accent);
     border-radius: 20px;
-    font-weight: 500;
-    font-size: var(--font-md);
+    font-weight: 600;
+    font-size: 14px;
 }
 
 /* ====================================
@@ -298,14 +200,14 @@
 }
 
 .habit-stats-overview-title {
-    font-size: var(--font-md);
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
     margin: 0;
     color: var(--text-muted);
 }
 
 .habit-stats-overview-period {
-    font-size: var(--font-base);
+    font-size: 12px;
     color: var(--text-faint);
 }
 
@@ -332,7 +234,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: var(--font-base);
+    font-size: 12px;
     color: var(--text-muted);
     cursor: pointer;
     transition: opacity 0.2s ease;
@@ -441,8 +343,8 @@
 }
 
 .card-back-title {
-    font-size: var(--font-md);
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--text-normal);
     display: flex;
     align-items: center;
@@ -451,7 +353,7 @@
 
 .card-back-title .back-arrow {
     opacity: 0.5;
-    font-size: var(--font-md);
+    font-size: 14px;
 }
 
 .flip-button {
@@ -465,7 +367,7 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: var(--font-md);
+    font-size: 14px;
 }
 
 .flip-button:hover {
@@ -493,8 +395,8 @@
 }
 
 .stat-column-title {
-    font-size: var(--font-xs);
-    font-weight: 500;
+    font-size: 10px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-faint);
@@ -528,14 +430,14 @@
 }
 
 .donut-percentage {
-    font-size: var(--font-xl);
+    font-size: 22px;
     font-weight: 700;
     color: var(--text-normal);
     line-height: 1;
 }
 
 .donut-label {
-    font-size: var(--font-xs);
+    font-size: 10px;
     color: var(--text-muted);
     margin-top: 4px;
 }
@@ -554,7 +456,7 @@
 }
 
 .top-day-icon {
-    font-size: var(--font-lg);
+    font-size: 18px;
 }
 
 .top-day-info {
@@ -562,13 +464,13 @@
 }
 
 .top-day-name {
-    font-size: var(--font-md);
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--text-normal);
 }
 
 .top-day-percent {
-    font-size: var(--font-sm);
+    font-size: 11px;
     color: var(--text-muted);
 }
 
@@ -599,7 +501,7 @@
     bottom: -18px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: var(--font-xs);
+    font-size: 8px;
     color: var(--text-faint);
     white-space: nowrap;
 }
@@ -608,12 +510,12 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: var(--font-sm);
+    font-size: 11px;
     margin-top: 4px;
 }
 
 .trend-arrow {
-    font-size: var(--font-md);
+    font-size: 14px;
 }
 
 .trend-arrow.up {
@@ -642,7 +544,7 @@
 }
 
 .level-icon {
-    font-size: var(--font-xl);
+    font-size: 22px;
 }
 
 .level-icon-img {
@@ -658,13 +560,13 @@
 }
 
 .level-number {
-    font-size: var(--font-sm);
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--text-muted);
 }
 
 .level-name {
-    font-size: var(--font-md);
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-normal);
 }
@@ -699,12 +601,12 @@
 .xp-numbers {
     display: flex;
     justify-content: space-between;
-    font-size: var(--font-xs);
+    font-size: 10px;
     color: var(--text-muted);
 }
 
 .xp-to-next {
-    font-size: var(--font-xs);
+    font-size: 10px;
     color: var(--text-faint);
     text-align: center;
 }
@@ -735,7 +637,7 @@
     color: white;
     padding: 4px 8px;
     border-radius: 6px;
-    font-size: var(--font-sm);
+    font-size: 11px;
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
@@ -808,14 +710,14 @@
     right: -2px;
     background: #22c55e;
     color: white;
-    font-size: var(--font-xs);
+    font-size: 10px;
     width: 16px;
     height: 16px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
+    font-weight: bold;
     border: 2px solid var(--card-bg);
     box-shadow: 0 2px 6px rgba(34, 197, 94, 0.4);
 }
@@ -831,7 +733,7 @@
     color: white;
     padding: 6px 10px;
     border-radius: 6px;
-    font-size: var(--font-xs);
+    font-size: 10px;
     white-space: nowrap;
     opacity: 1;
     pointer-events: none;
@@ -887,7 +789,7 @@
     position: absolute;
     top: 12px;
     right: 12px;
-    font-size: var(--font-base);
+    font-size: 12px;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
@@ -922,7 +824,7 @@
     }
 
     .donut-percentage {
-        font-size: var(--font-lg);
+        font-size: 18px;
     }
 }
 
@@ -950,8 +852,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: var(--font-lg);
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 /* Icono del hábito - puede ser emoji, imagen, o icono */
@@ -961,7 +863,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--font-xl);
+    font-size: 20px;
 }
 
 .habit-icon img {
@@ -975,7 +877,7 @@
 }
 
 .habit-streak {
-    font-size: var(--font-base);
+    font-size: 12px;
     color: var(--text-muted);
     padding: 6px 14px;
     background: rgba(255, 255, 255, 0.05);
@@ -1014,7 +916,7 @@
 }
 
 .month-label {
-    font-size: var(--font-xs);
+    font-size: 10px;
     color: var(--text-faint);
     font-weight: 500;
     min-width: 56px;
@@ -1035,7 +937,7 @@
 
 .day-label {
     height: var(--cell-size);
-    font-size: var(--font-xs);
+    font-size: 9px;
     color: var(--text-faint);
     display: flex;
     align-items: center;
@@ -1102,7 +1004,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 8px 12px;
-    font-size: var(--font-base);
+    font-size: 12px;
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
@@ -1117,7 +1019,7 @@
 }
 
 .grid-tooltip-date {
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 4px;
 }
 
@@ -1146,7 +1048,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: var(--font-base);
+    font-size: 12px;
     color: var(--text-muted);
 }
 
@@ -1207,7 +1109,7 @@
 
 .habit-grid-message h2 {
     margin-bottom: 12px;
-    font-size: var(--font-2xl);
+    font-size: 24px;
 }
 
 .habit-grid-message p {
@@ -1243,7 +1145,7 @@
     padding: 16px;
     border-radius: 8px;
     overflow-x: auto;
-    font-size: var(--font-base);
+    font-size: 12px;
     line-height: 1.5;
     border: 1px solid var(--background-modifier-border);
 }
@@ -1280,7 +1182,7 @@
     background: var(--background-primary);
     border-radius: 8px;
     font-family: var(--font-monospace);
-    font-size: var(--font-base);
+    font-size: 12px;
     word-break: break-all;
     cursor: pointer;
     transition: background 0.2s ease;
@@ -1322,7 +1224,7 @@
     }
 
     .habit-grid-banner-title {
-        font-size: var(--font-xl);
+        font-size: 22px;
     }
 
     /* ✅ AGREGADO: Barra de progreso en móvil */
@@ -1360,7 +1262,7 @@
     flex-direction: column;
     gap: 16px;
     /* ✅ Altura automática que se adapta */
-    height: 520px; /* ✅ Altura fija exacta */
+    height: 320px; /* ✅ Altura fija exacta */
     min-height: unset;
     max-height: unset;
     overflow: hidden;
@@ -1374,14 +1276,14 @@
 }
 
 .today-date {
-    font-size: var(--font-lg);
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-normal);
     margin-bottom: 4px;
 }
 
 .today-subtitle {
-    font-size: var(--font-base);
+    font-size: 12px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1451,8 +1353,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
-    font-size: var(--font-md);
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 /* Label del hábito */
@@ -1464,11 +1366,11 @@
 }
 
 .today-habit-emoji {
-    font-size: var(--font-lg);
+    font-size: 18px;
 }
 
 .today-habit-name {
-    font-size: var(--font-md);
+    font-size: 14px;
     font-weight: 500;
     color: var(--text-normal);
 }
@@ -1483,8 +1385,8 @@
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     padding-top: 12px;
     text-align: center;
-    font-size: var(--font-base);
-    font-weight: 500;
+    font-size: 13px;
+    font-weight: 600;
     color: var(--text-normal);
     flex-shrink: 0;
 }
